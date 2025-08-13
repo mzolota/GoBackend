@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetUpRouter(repo *Repository) *gin.Engine {
+func SetUpRouter(repo *Repository, hub *Hub) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.Default())
 	// POST - registracija korisnika
@@ -84,10 +84,15 @@ func SetUpRouter(repo *Repository) *gin.Engine {
 		})
 	})
 
+	// endpoint za weboscket komunikaciju
+	r.GET("/ws", func(c *gin.Context) {
+		handleConnections(hub, c.Writer, c.Request)
+	})
+
 	return r
 }
 
-func StartWebserver() {
+func StartWebserver(hub *Hub) {
 	err := Connect()
 	if err != nil {
 		fmt.Println("Neuspjela konekcija na bazu:", err)
@@ -95,6 +100,6 @@ func StartWebserver() {
 	}
 
 	repo := &Repository{Conn: Conn}
-	router := SetUpRouter(repo)
+	router := SetUpRouter(repo, hub)
 	router.Run(":8080")
 }

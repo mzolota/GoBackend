@@ -1,5 +1,8 @@
 package main
 
 func main() {
-	StartWebserver()
+	hub := newHub()
+	go hub.run()
+
+	StartWebserver(hub)
 }
